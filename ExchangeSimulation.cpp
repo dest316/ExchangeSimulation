@@ -3,7 +3,8 @@
 #include <memory>
 #include <time.h>
 #include "TradingInstruments.h"
-#include "RBTree.h"
+#include "DoublyLinkedList.h"
+
 
 using namespace std;
 
@@ -54,8 +55,11 @@ int main()
 {
 	
 	srand(time(NULL));
-	auto rb = new RBTree<Order>();
-	
+	auto dllist = new DoublyLinkedList<int>();
+	for (auto it = dllist->begin(); it != nullptr; ++it)
+	{
+
+	}
 	
 	return 0;
 }
