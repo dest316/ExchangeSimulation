@@ -56,10 +56,19 @@ int main()
 	
 	srand(time(NULL));
 	auto dllist = new DoublyLinkedList<int>();
+	for (int i = 1; i < 23; i += 2) dllist->Add(i);
 	for (auto it = dllist->begin(); it != nullptr; ++it)
 	{
-
+		cout << it->data << endl;
 	}
+	dllist->Clear();
+	dllist->Add(3);
+	dllist->Add(3);
+	dllist->Add(2);
+	dllist->Delete(3);
+	dllist->Print();
+	cout << endl << endl << dllist->GetDifferenceLength() << '\t' << dllist->GetLength() << endl;
+	dllist->Clear();
 	
 	return 0;
 }
