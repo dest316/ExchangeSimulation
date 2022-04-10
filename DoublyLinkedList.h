@@ -29,7 +29,7 @@ private:
 	Node<T>* tail;
 public:
 	
-	using value_type = T;
+	using value_type = Node<T>;
 	using size_type = size_t;
 	using difference_type = ptrdiff_t;
 	using reference = value_type&;
@@ -54,21 +54,25 @@ public:
 		DoublyLinkedListBidirectionalIterator(const DoublyLinkedListBidirectionalIterator& it) : _value(it._value) {}
 		DoublyLinkedListBidirectionalIterator& operator++()
 		{			
-			++_value;
+			_value = _value->next;
 			return *this;
 		}
 		DoublyLinkedListBidirectionalIterator operator++(int)
 		{
-			return DoublyLinkedListBidirectionalIterator(_value++);
+			auto tmp = this;
+			_value = _value->next;
+			return tmp;
 		}
 		DoublyLinkedListBidirectionalIterator& operator--()
 		{
-			-- _value;
+			_value = _value->prev;
 			return *this;
 		}
 		DoublyLinkedListBidirectionalIterator operator--(int)
 		{
-			return DoublyLinkedListBidirectionalIterator(_value--);
+			auto tmp = this;
+			_value = _value->prev;
+			return tmp;
 		}
 		reference operator*()
 		{
@@ -147,9 +151,8 @@ public:
 			cout << cur->data << ":" << cur->counter << endl;
 			cur = cur->next;
 		}
-
 	}
-	void Delete(T deleteValue) //не работает, перепроверить
+	void Delete(T deleteValue)
 	{
 		if (FoundElem(deleteValue) != nullptr)
 		{
@@ -183,12 +186,32 @@ public:
 					nextElem->prev = prevElem;
 					prevElem->next = nextElem;					
 				}
-				delete deletedElem;
-				Print();
+				delete deletedElem;				
 			}
 		}
 	}
-	
+	int GetLength()
+	{
+		Node<T>* cur = head;
+		int length = 0;
+		while (cur != nullptr)
+		{
+			length += cur->counter;
+			cur = cur->next;
+		}
+		return length;
+	}
+	int GetDifferenceLength()
+	{
+		Node<T>* cur = head;
+		auto length = 0;
+		while (cur != nullptr)
+		{
+			length++;
+			cur = cur->next;
+		}
+		return length;
+	}
 	void Clear()
 	{
 		Node<T>* cur = head;
@@ -203,9 +226,17 @@ public:
 	{
 		Clear();
 	}
-	DoublyLinkedListBidirectionalIterator begin() { return DoublyLinkedListBidirectionalIterator(this->head); }
-	DoublyLinkedListBidirectionalIterator end() { return DoublyLinkedListBidirectionalIterator(this->tail); }
+	DoublyLinkedListBidirectionalIterator begin()
+	{
+		return DoublyLinkedListBidirectionalIterator(this->head);
+	}
+	DoublyLinkedListBidirectionalIterator end() 
+	{
+		return DoublyLinkedListBidirectionalIterator(this->tail); 
+	}
 };
+
+
 
 
 
