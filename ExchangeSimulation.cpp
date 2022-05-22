@@ -5,24 +5,20 @@
 #include "TradingInstruments.h"
 #include "DoublyLinkedList.h"
 
-
 using namespace std;
-
-
-
 
 class Client
 {
 private:
 	double _balance = 0;
-	vector<TradingInstrument> _positions;
+	DoublyLinkedList<TradingInstrument> _positions;
 	static Client* _client;
 	Client()
 	{
-		
+		_positions = *(new DoublyLinkedList<TradingInstrument>());
 	}
 public:
-	static Client GetClient()
+	static Client& GetClient()
 	{
 		if (_client == nullptr)
 		{
@@ -31,45 +27,60 @@ public:
 		return *_client;
 	}
 	void operator=(const Client&) = delete;
-	void Buy(TradingInstrument purchasedAsset, int count)
+	DoublyLinkedList<TradingInstrument>& GetPositions() { return _positions; }
+	int Buy(TradingInstrument asset)
 	{
-		if (purchasedAsset.GetPrice() <= _balance && purchasedAsset.GetOrderBySellCount() > count)
+		if (asset.IsBuyable())
 		{
-			_balance -= purchasedAsset.GetPrice();
-			purchasedAsset.SetOrderBySellCount(count);
+			_positions.Add(asset);
+			_balance -= asset.GetPriceToSell();
+			auto tmp = asset.GetGlass().GetGlassToSell().begin();
+			
+			asset.GetGlass().GetGlassToSell().erase(tmp); 
+			return 0;
 		}
+		return -1;
 	}
-	void Buy(TradingInstrument purchasedAsset, double desiredPrice, int count)
+	void TopUpBalance(int amount)
 	{
-		for (auto order: purchasedAsset.GetListOfOrders())
+		_balance += amount;
+	}
+	int WithdrawMoney(int amount)
+	{
+		return (amount > _balance) ? -1 : 0;
+	}
+	int GetLiquidCost()
+	{
+		int summ = 0;
+		for (auto& i : _positions)
 		{
-			//логика такая: ищем заявки с меньшей ценой, чем хотим купить и после этого удаляем эти заявки из вектора, вычитаем
-			//их стоимость с баланса и так пока не закончатся подходящие заявки или пока не выполним эту заявку.
+			summ += i.data.GetAveragePrice();
 		}
+		return summ;
 	}
 };
 
 Client* Client::_client = nullptr;
 
+ostream& operator<<(std::ostream& out, TradingInstrument& ti)
+{
+	out << ti.GetName();
+	return out;
+}
+
 int main()
 {
 	
 	srand(time(NULL));
-	auto dllist = new DoublyLinkedList<int>();
-	for (int i = 1; i < 23; i += 2) dllist->Add(i);
-	for (auto it = dllist->begin(); it != nullptr; ++it)
-	{
-		cout << it->data << endl;
-	}
-	dllist->Clear();
-	dllist->Add(3);
-	dllist->Add(3);
-	dllist->Add(2);
-	dllist->Delete(3);
-	dllist->Print();
-	cout << endl << endl << dllist->GetDifferenceLength() << '\t' << dllist->GetLength() << endl;
-	dllist->Clear();
-	
+	TradingInstrument* trad = new TradingInstrument("example");
+	Stock* sberStock = new Stock("sberbank");
+	Stock* appleStock = new Stock("apple");
+	Client::GetClient();
+	Client::GetClient().Buy(*trad);
+	Client::GetClient().Buy(*sberStock);
+	Client::GetClient().Buy(*appleStock);
+	cout << Client::GetClient().GetLiquidCost() << endl;
+	Client::GetClient().GetPositions().Print();
 	return 0;
 }
 
