@@ -38,12 +38,13 @@ public:
 	using const_pointer = const value_type*;
 	using iterator_category = std::bidirectional_iterator_tag;
 
-	using iterator = pointer;
-	using const_iterator = pointer;
+	/*using iterator = pointer;
+	using const_iterator = const_pointer;
 	using reverse_iterator = std::reverse_iterator<iterator>;
-	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+	using const_reverse_iterator = std::reverse_iterator<const_iterator>;*/
 
 	friend class DoublyLinkedListBidirectionalIterator;
+	//friend class ConstDoublyLinkedListBidirectionalIterator;
 
 	class DoublyLinkedListBidirectionalIterator
 	{
@@ -89,9 +90,11 @@ public:
 		auto operator<=>(const DoublyLinkedListBidirectionalIterator value) const
 		{
 			return value <=> value._value;
-		}
+		}		
 	};
-
+	
+	using iterator = DoublyLinkedListBidirectionalIterator;
+	using const_iterator = const iterator;
 
 	DoublyLinkedList()
 	{
@@ -220,7 +223,13 @@ public:
 			auto tmp = cur->next;
 			Delete(cur->data);
 			cur = tmp;
-		}
+		} 
+	}
+	void swap(Node<T>* firstElem, Node<T>* secondElem)
+	{
+		T tmp = firstElem->data;
+		firstElem->data = secondElem->data;
+		secondElem->data = tmp;
 	}
 	~DoublyLinkedList()
 	{
@@ -232,10 +241,17 @@ public:
 	}
 	DoublyLinkedListBidirectionalIterator end() 
 	{
-		return DoublyLinkedListBidirectionalIterator(this->tail); 
+		return DoublyLinkedListBidirectionalIterator(this->tail->next); 
+	}
+	const_iterator cbegin()
+	{
+		return const_iterator(this->begin());
+	}
+	const_iterator cend()
+	{
+		return const_iterator(this->end());
 	}
 };
-
 
 
 
