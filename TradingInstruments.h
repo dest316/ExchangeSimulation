@@ -32,6 +32,28 @@ public:
 	}
 	vector<int>& GetGlassToBuy() { return glassToBuy; }
 	vector<int>& GetGlassToSell() { return glassToSell; }
+	void Update()
+	{
+		auto update = (rand() % 11) - 5; //считаем, куда изменится цена: > 0 - рост, < 0 - падение
+		if (update > 0)
+		{
+			for (int i = 0; i < update; i++)
+			{
+				if (!glassToSell.empty())
+					glassToSell.erase(glassToSell.begin()); //удаляем заявки на продажу => цена растет
+				
+			}
+			if (!glassToSell.empty())
+			{
+				auto maxBuy = glassToBuy.empty() ? 0 : glassToBuy[glassToBuy.size() - 1]; 
+				for (int i = 0; i < update; i++)
+				{
+					glassToBuy.push_back(maxBuy + (rand() % (glassToSell[0] - maxBuy))); //создаем заявки на покупки в пределах [max цена на покупку; min цена на продажу]
+				}
+			}
+
+		}
+	}
 };
 
 class Order
@@ -67,15 +89,22 @@ public:
 		glass = new Glass();
 		priceToBuy = glass->GetGlassToBuy()[glass->GetGlassToBuy().size() - 1];
 		priceToSell = glass->GetGlassToSell()[0];
+		longLeverage = 1.0; //пока захардкодил 1
 	}
 	TradingInstrument() = default;
+	double GetLongLeverage() { return longLeverage; }
 	double GetPriceToBuy() { return priceToBuy; }
 	double GetPriceToSell() { return priceToSell; }
 	double GetAveragePrice() { return (priceToBuy + priceToSell) / 2; }
 	string GetName() { return name; }
 	Glass& GetGlass() { return (*glass); }
 	bool IsBuyable() { return (!glass->GetGlassToSell().empty()); }
+	bool IsSellable() { return (!glass->GetGlassToBuy().empty()); }
 	bool operator==(const TradingInstrument& other) { return this->name == other.name; }
+	void Update() //этот метод будет отвечать за обновление цены актива
+	{
+		glass->Update();
+	}
 };
 
 
@@ -86,4 +115,6 @@ public:
 	Stock(string name) : TradingInstrument(name) {}
 	Stock() = default;
 };
+
+
 
